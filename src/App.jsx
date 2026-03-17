@@ -135,6 +135,9 @@ function TripPage({ trip, onBack }) {
   const [flightUpgrade, setFlightUpgrade] = useState(false);
   const [showBookModal, setShowBookModal] = useState(false);
   const [passengers, setPassengers] = useState([{ name: '', dob: '', passport: '', nationality: '' }]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareForm, setShareForm] = useState({ friendName: '', friendEmail: '', yourName: '', message: '' });
+  const [shareSent, setShareSent] = useState(false);
 
   const addPassenger = useCallback(() => {
     setPassengers(prev => [...prev, { name: '', dob: '', passport: '', nationality: '' }]);
@@ -353,6 +356,13 @@ function TripPage({ trip, onBack }) {
           );
         })}
 
+        <div className="share-cta-section">
+          <div className="share-cta-icon">✉️</div>
+          <h3>Share this trip with a friend</h3>
+          <p>Invite someone to join you and you'll <strong>both get 5% off</strong> your trip.</p>
+          <button className="btn-share-large" onClick={() => { setShareSent(false); setShareForm({ friendName: '', friendEmail: '', yourName: '', message: '' }); setShowShareModal(true); }}>Send Invite</button>
+        </div>
+
         <div className="custom-cta-section">
           <h3>Want this trip tailored to you?</h3>
           <p>Our travel experts can customize dates, hotels, activities — anything you need.</p>
@@ -455,6 +465,51 @@ function TripPage({ trip, onBack }) {
               <textarea placeholder="What would you like to change or add?" rows={4} />
               <button type="submit" className="btn-book">Send Request</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showShareModal && (
+        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="modal share-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowShareModal(false)}>&times;</button>
+            {shareSent ? (
+              <div className="share-success">
+                <div className="share-success-icon">✅</div>
+                <h2>Invite Sent!</h2>
+                <p>We've emailed the trip details for <strong>{trip.country}: {trip.title}</strong> to <strong>{shareForm.friendEmail}</strong>.</p>
+                <p className="share-discount-note">When your friend books, you'll both receive a <strong>5% discount</strong> automatically.</p>
+                <button className="btn-book" onClick={() => setShowShareModal(false)}>Done</button>
+              </div>
+            ) : (
+              <>
+                <h2>Share {trip.country} Trip</h2>
+                <p className="share-subtitle">Send your friend the full trip details. When they book, you <strong>both save 5%</strong> on your trip.</p>
+                <form onSubmit={e => { e.preventDefault(); setShareSent(true); }}>
+                  <div className="booking-section">
+                    <h3>Your Friend</h3>
+                    <input type="text" placeholder="Friend's name" required value={shareForm.friendName} onChange={e => setShareForm(f => ({ ...f, friendName: e.target.value }))} />
+                    <input type="email" placeholder="Friend's email address" required value={shareForm.friendEmail} onChange={e => setShareForm(f => ({ ...f, friendEmail: e.target.value }))} />
+                  </div>
+                  <div className="booking-section">
+                    <h3>From You</h3>
+                    <input type="text" placeholder="Your name" required value={shareForm.yourName} onChange={e => setShareForm(f => ({ ...f, yourName: e.target.value }))} />
+                    <textarea placeholder="Add a personal message (optional)" rows={3} value={shareForm.message} onChange={e => setShareForm(f => ({ ...f, message: e.target.value }))} />
+                  </div>
+                  <div className="share-preview">
+                    <div className="share-preview-card">
+                      <div className="share-preview-image" style={{ backgroundImage: `url(${trip.heroImage})` }} />
+                      <div className="share-preview-info">
+                        <strong>{trip.flag} {trip.country}: {trip.title}</strong>
+                        <span>{trip.departureDateFull} · {trip.duration} days</span>
+                        <span className="share-preview-price">From ${trip.basePrice.toLocaleString()}/person <span className="share-discount-badge">5% off with referral</span></span>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="submit" className="btn-book">Send Invite ✉️</button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
