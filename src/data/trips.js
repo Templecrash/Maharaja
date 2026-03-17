@@ -1253,8 +1253,207 @@ export const trips = [
 ];
 
 export const personalityLabels = {
-  foodie: { label: 'Food Lover', emoji: '\u{1F35C}' },
-  adventure: { label: 'Adventure', emoji: '\u{1F3D4}\u{FE0F}' },
-  culture: { label: 'Culture', emoji: '\u{1F3CE}\u{FE0F}' },
-  luxury: { label: 'Luxury', emoji: '\u{1F48E}' },
+  foodie: { label: 'Food Lover', emoji: '🍜' },
+  adventure: { label: 'Adventure', emoji: '🏔️' },
+  culture: { label: 'Culture', emoji: '🏎️' },
+  luxury: { label: 'Luxury', emoji: '💎' },
 };
+
+export const travelStyles = [
+  { id: 'luxury', label: 'Luxury', emoji: '💎' },
+  { id: 'adventure', label: 'Adventure', emoji: '🧗' },
+  { id: 'family', label: 'Family', emoji: '👨‍👩‍👧‍👦' },
+  { id: 'honeymoon', label: 'Honeymoon', emoji: '💕' },
+  { id: 'cultural', label: 'Cultural', emoji: '🏛️' },
+  { id: 'foodie', label: 'Food & Wine', emoji: '🍷' },
+  { id: 'safari', label: 'Safari', emoji: '🦁' },
+  { id: 'beach', label: 'Beach', emoji: '🏖️' },
+];
+
+export const tripStyles = {
+  japan: ['luxury', 'cultural', 'foodie', 'honeymoon'],
+  brazil: ['adventure', 'beach', 'cultural', 'family'],
+  vietnam: ['foodie', 'adventure', 'cultural', 'honeymoon'],
+  ecuador: ['adventure', 'safari', 'family', 'beach'],
+  patagonia: ['adventure', 'luxury', 'honeymoon'],
+  sanfrancisco: ['foodie', 'cultural', 'family', 'luxury'],
+  egypt: ['cultural', 'adventure', 'luxury', 'family'],
+  jordan: ['cultural', 'adventure', 'honeymoon', 'luxury'],
+};
+
+export const dayByDay = {
+  japan: [
+    { day: 1, title: 'Arrive in Tokyo', description: 'Land at Narita/Haneda, private transfer to your hotel in Shinjuku. Evening free to explore the neon-lit streets.', location: 'Tokyo', icon: '✈️' },
+    { day: 2, title: 'Tsukiji & Shibuya', description: 'Morning sushi experience at the outer market, then explore Shibuya Crossing, Harajuku, and Meiji Shrine.', location: 'Tokyo', icon: '🍣' },
+    { day: 3, title: 'Akihabara & Golden Gai', description: 'Retro gaming in Akihabara, Gotokuji temple visit, and speakeasy bar crawl through Golden Gai at night.', location: 'Tokyo', icon: '🎮' },
+    { day: 4, title: 'Yokohama Day Trip', description: 'JDM car meet at Daikoku PA, Chinatown lunch, and Yokohama waterfront sunset.', location: 'Tokyo', icon: '🚗' },
+    { day: 5, title: 'Bullet Train to Kyoto', description: 'Shinkansen from Tokyo to Kyoto (2.5 hrs). Check in, afternoon free to explore Gion district.', location: 'Kyoto', icon: '🚄' },
+    { day: 6, title: 'Fushimi Inari & Nishiki', description: 'Thousands of orange torii gates at sunrise, then Nishiki Market food tour in the afternoon.', location: 'Kyoto', icon: '⛩️' },
+    { day: 7, title: 'Arashiyama & Tea Ceremony', description: 'Bamboo grove walk, monkey park, then a private tea ceremony in a traditional machiya.', location: 'Kyoto', icon: '🍵' },
+    { day: 8, title: 'Zen Gardens & Cooking Class', description: 'Morning meditation at a Zen temple, afternoon ramen-making class with a local chef.', location: 'Kyoto', icon: '🧘' },
+    { day: 9, title: 'Free Day / Optional Tattoo', description: 'Explore at your own pace. Optional: tattoo session at a licensed Shibuya studio.', location: 'Kyoto', icon: '🎨' },
+    { day: 10, title: 'Departure', description: 'Private transfer to Kansai International Airport. Sayonara!', location: 'Kyoto', icon: '👋' },
+  ],
+  brazil: [
+    { day: 1, title: 'Arrive in Rio', description: 'Land at GIG, private transfer to Copacabana. Welcome caipirinha on the rooftop.', location: 'Rio de Janeiro', icon: '✈️' },
+    { day: 2, title: 'Christ the Redeemer & Sugarloaf', description: 'Morning at Cristo Redentor, afternoon cable car up Sugarloaf Mountain for sunset views.', location: 'Rio de Janeiro', icon: '⛰️' },
+    { day: 3, title: 'Favela Tour & Samba Night', description: 'Community-led favela tour in Rocinha, then live samba at Pedra do Sal.', location: 'Rio de Janeiro', icon: '🥁' },
+    { day: 4, title: 'Hang Gliding & Beach Day', description: 'Tandem hang glide over São Conrado, then relax on Ipanema Beach.', location: 'Rio de Janeiro', icon: '🪂' },
+    { day: 5, title: 'Street Food Crawl', description: 'Full-day food tour through downtown Rio — pastéis, açaí, churrasco, and more.', location: 'Rio de Janeiro', icon: '🍖' },
+    { day: 6, title: 'Football & Nightlife', description: 'Attend a live match at Maracanã, then Lapa nightlife district.', location: 'Rio de Janeiro', icon: '⚽' },
+    { day: 7, title: 'Departure', description: 'Private transfer to airport. Até logo, Rio!', location: 'Rio de Janeiro', icon: '👋' },
+  ],
+  vietnam: [
+    { day: 1, title: 'Arrive in Hanoi', description: 'Land at Noi Bai, transfer to Old Quarter hotel. Evening street food walk.', location: 'Hanoi', icon: '✈️' },
+    { day: 2, title: 'Hanoi Food Tour', description: 'Motorbike street food tour — pho, bun cha, egg coffee, and hidden alley gems.', location: 'Hanoi', icon: '🍜' },
+    { day: 3, title: 'Ha Long Bay Cruise', description: 'Overnight junk boat cruise through limestone karsts, kayaking, and cave exploration.', location: 'Ha Long Bay', icon: '🛥️' },
+    { day: 4, title: 'Ha Long Bay Sunrise', description: 'Tai chi at sunrise on deck, swim in emerald waters, return to Hanoi.', location: 'Ha Long Bay', icon: '🌅' },
+    { day: 5, title: 'Fly to Da Nang', description: 'Short flight south, transfer to Hoi An. Afternoon free on An Bang Beach.', location: 'Hoi An', icon: '🏖️' },
+    { day: 6, title: 'Hoi An Ancient Town', description: 'Lantern-making workshop, tailor fitting, and basket boat ride on the river.', location: 'Hoi An', icon: '🏮' },
+    { day: 7, title: 'Cooking Class & Beach', description: 'Morning Vietnamese cooking class, afternoon beach time or spa.', location: 'Hoi An', icon: '👩‍🍳' },
+    { day: 8, title: 'Departure', description: 'Transfer to Da Nang airport. Tạm biệt, Vietnam!', location: 'Hoi An', icon: '👋' },
+  ],
+  ecuador: [
+    { day: 1, title: 'Arrive in Quito', description: 'Land at Mariscal Sucre, transfer to historic center hotel.', location: 'Quito', icon: '✈️' },
+    { day: 2, title: 'Quito Old Town', description: 'UNESCO colonial center tour, equator monument, chocolate tasting.', location: 'Quito', icon: '🏛️' },
+    { day: 3, title: 'Fly to Galápagos', description: 'Flight to Baltra, transfer to Santa Cruz island hotel.', location: 'Galápagos', icon: '🐢' },
+    { day: 4, title: 'Giant Tortoises & Lava Tunnels', description: 'Charles Darwin Research Station, highland tortoise reserve, lava tunnel hike.', location: 'Galápagos', icon: '🌋' },
+    { day: 5, title: 'Snorkeling & Kayaking', description: 'Snorkel with sea lions at Tortuga Bay, afternoon kayak tour.', location: 'Galápagos', icon: '🤿' },
+    { day: 6, title: 'Island Hopping', description: 'Boat to Isabela Island — penguins, marine iguanas, and blue-footed boobies.', location: 'Galápagos', icon: '🐧' },
+    { day: 7, title: 'Scuba Diving Day', description: 'Two-tank dive — hammerhead sharks, manta rays, and sea turtles.', location: 'Galápagos', icon: '🦈' },
+    { day: 8, title: 'Free Day / Yacht Option', description: 'Relax or optional sunset yacht cruise around the islands.', location: 'Galápagos', icon: '⛵' },
+    { day: 9, title: 'Cloud Forest', description: 'Fly back to mainland, transfer to Mindo cloud forest. Zip-line and birdwatching.', location: 'Mindo', icon: '🌿' },
+    { day: 10, title: 'Thermal Springs', description: 'Papallacta hot springs in the Andes. Relax and reflect.', location: 'Papallacta', icon: '♨️' },
+    { day: 11, title: 'Departure', description: 'Transfer to Quito airport. ¡Hasta luego!', location: 'Quito', icon: '👋' },
+  ],
+  patagonia: [
+    { day: 1, title: 'Arrive in Buenos Aires', description: 'Land at Ezeiza, transfer to San Telmo boutique hotel. Welcome Malbec dinner.', location: 'Buenos Aires', icon: '✈️' },
+    { day: 2, title: 'Fly to El Calafate', description: 'Morning flight south, settle into lakeside lodge with Andes views.', location: 'El Calafate', icon: '🏔️' },
+    { day: 3, title: 'Perito Moreno Glacier', description: 'Walk the boardwalks watching ice calve thunderously into the lake. Optional ice trekking.', location: 'El Calafate', icon: '🧊' },
+    { day: 4, title: 'Estancia Day & Horseback', description: 'Gaucho ranch experience, horseback riding across the steppe, traditional asado lunch.', location: 'El Calafate', icon: '🐴' },
+    { day: 5, title: 'Transfer to Torres del Paine', description: 'Drive to Chilean Patagonia, entering Torres del Paine National Park.', location: 'Torres del Paine', icon: '🚐' },
+    { day: 6, title: 'Base of the Towers Hike', description: 'Iconic full-day hike to the base of the granite towers. Unforgettable views.', location: 'Torres del Paine', icon: '🥾' },
+    { day: 7, title: 'Grey Glacier & Lago Grey', description: 'Boat across Lago Grey to the glacier face, kayak among icebergs.', location: 'Torres del Paine', icon: '🛶' },
+    { day: 8, title: 'Puma Tracking', description: 'Dawn puma tracking with expert wildlife guide. Spot guanacos and condors.', location: 'Torres del Paine', icon: '🐆' },
+    { day: 9, title: 'Patagonia Wine & Farewell', description: 'Morning at leisure, afternoon wine tasting. Farewell dinner at the lodge.', location: 'Torres del Paine', icon: '🍷' },
+    { day: 10, title: 'Departure', description: 'Transfer to Punta Arenas airport. ¡Chao, Patagonia!', location: 'Punta Arenas', icon: '👋' },
+  ],
+  sanfrancisco: [
+    { day: 1, title: 'Arrive in San Francisco', description: 'Land at SFO, transfer to Union Square hotel. Walk to Fisherman\'s Wharf.', location: 'San Francisco', icon: '✈️' },
+    { day: 2, title: 'Golden Gate & Alcatraz', description: 'Bike across the Golden Gate Bridge, afternoon Alcatraz Island tour.', location: 'San Francisco', icon: '🌉' },
+    { day: 3, title: 'Mission District Food Crawl', description: 'Tacos, burritos, craft beer, and street art in the Mission.', location: 'San Francisco', icon: '🌮' },
+    { day: 4, title: 'Napa Valley Wine Tour', description: 'Full-day wine country excursion — 3 wineries, barrel tasting, gourmet lunch.', location: 'Napa Valley', icon: '🍷' },
+    { day: 5, title: 'Silicon Valley & Departure', description: 'Tech campus tour, Stanford walk, then transfer to SFO. See you, SF!', location: 'San Francisco', icon: '👋' },
+  ],
+  egypt: [
+    { day: 1, title: 'Arrive in Cairo', description: 'Land at Cairo International, private transfer to hotel near the Pyramids.', location: 'Cairo', icon: '✈️' },
+    { day: 2, title: 'Pyramids & Sphinx', description: 'Private Egyptologist-led tour of the Giza plateau. Enter the Great Pyramid.', location: 'Cairo', icon: '🏛️' },
+    { day: 3, title: 'Grand Egyptian Museum', description: 'VIP early access to Tutankhamun\'s treasures. Afternoon at Khan el-Khalili bazaar.', location: 'Cairo', icon: '🗿' },
+    { day: 4, title: 'Cairo Street Food & Camel Ride', description: 'Sunrise camel ride at the pyramids, then downtown Cairo food crawl.', location: 'Cairo', icon: '🐪' },
+    { day: 5, title: 'Fly to Luxor', description: 'Short flight south. Check into Nile-view hotel. Sunset felucca cruise.', location: 'Luxor', icon: '⛵' },
+    { day: 6, title: 'Valley of the Kings', description: 'Descend into painted royal tombs. Visit Tutankhamun\'s tomb and Hatshepsut Temple.', location: 'Luxor', icon: '⚱️' },
+    { day: 7, title: 'Hot Air Balloon & Karnak', description: 'Sunrise balloon over the West Bank, afternoon Karnak Temple with sound & light show.', location: 'Luxor', icon: '🎈' },
+    { day: 8, title: 'Luxor Free Day', description: 'Explore at leisure — Luxor Museum, West Bank markets, or relax by the pool.', location: 'Luxor', icon: '☀️' },
+    { day: 9, title: 'Transfer to Hurghada', description: 'Drive to the Red Sea coast. Settle into beachfront resort.', location: 'Hurghada', icon: '🏖️' },
+    { day: 10, title: 'Red Sea Scuba Diving', description: 'Two guided dives on pristine coral reefs. Sea turtles, dolphins, and tropical fish.', location: 'Hurghada', icon: '🤿' },
+    { day: 11, title: 'Desert Safari & Giftun Island', description: 'Morning quad biking, afternoon snorkeling at Giftun Island marine park.', location: 'Hurghada', icon: '🏜️' },
+    { day: 12, title: 'Departure', description: 'Transfer to Hurghada airport. Ma\'a salama, Egypt!', location: 'Hurghada', icon: '👋' },
+  ],
+  jordan: [
+    { day: 1, title: 'Arrive in Amman', description: 'Land at Queen Alia International, transfer to Rainbow Street boutique hotel.', location: 'Amman', icon: '✈️' },
+    { day: 2, title: 'Amman Citadel & Food Tour', description: 'Morning at the Citadel and Roman Theatre. Afternoon mansaf feast and street food crawl.', location: 'Amman', icon: '🍖' },
+    { day: 3, title: 'Jerash & Cooking Class', description: 'Day trip to Jerash Roman ruins. Evening Jordanian home cooking class.', location: 'Amman', icon: '🏟️' },
+    { day: 4, title: 'Drive to Petra', description: 'Scenic King\'s Highway drive. Arrive at Petra, settle in. Evening Petra by Night.', location: 'Petra', icon: '🕯️' },
+    { day: 5, title: 'Full Day in Petra', description: 'Walk the Siq to the Treasury, climb to the Monastery, explore hidden trails with Bedouin guide.', location: 'Petra', icon: '🌹' },
+    { day: 6, title: 'Little Petra & Wine Caves', description: 'Morning at Siq al-Barid, afternoon wine tasting in ancient Nabataean caves.', location: 'Petra', icon: '🍷' },
+    { day: 7, title: 'Drive to Wadi Rum', description: 'Enter the Martian desert. 4x4 safari through sandstone canyons and arches.', location: 'Wadi Rum', icon: '🚙' },
+    { day: 8, title: 'Wadi Rum Sunrise & Stargazing', description: 'Sunrise camel trek, rock scramble, Bedouin dinner, and telescope stargazing.', location: 'Wadi Rum', icon: '🔭' },
+    { day: 9, title: 'Dead Sea', description: 'Drive to the Dead Sea. Float in the saltiest water on Earth, mud spa treatment.', location: 'Dead Sea', icon: '🧖' },
+    { day: 10, title: 'Departure', description: 'Optional Wadi Mujib canyon hike, then transfer to Amman airport. Ma\'a salama!', location: 'Amman', icon: '👋' },
+  ],
+};
+
+export const tripReviews = {
+  japan: [
+    { name: 'Sarah M.', avatar: '👩‍💼', rating: 5, date: 'Oct 2025', text: 'The hidden bar crawl through Golden Gai was the highlight of our trip. Our guide Ryo knew every bartender by name. Absolutely magical.', tripHighlight: 'Golden Gai Bars' },
+    { name: 'David & Lin K.', avatar: '👫', rating: 5, date: 'Apr 2025', text: 'Maharaja nailed every detail — from the ryokan in Kyoto to the car meet at Daikoku. We felt like locals, not tourists.', tripHighlight: 'JDM Car Meet' },
+    { name: 'James R.', avatar: '👨', rating: 5, date: 'Oct 2024', text: 'Getting a tattoo from Takeshi Mori was a bucket-list moment. The sushi omakase was life-changing. Already planning trip #2.', tripHighlight: 'Tattoo & Sushi' },
+  ],
+  brazil: [
+    { name: 'Mike & Ana P.', avatar: '👫', rating: 5, date: 'Nov 2025', text: 'Hang gliding over Rio was absolutely terrifying and absolutely incredible. The favela tour gave us a side of Rio most tourists never see.', tripHighlight: 'Hang Gliding' },
+    { name: 'Christina L.', avatar: '👩', rating: 5, date: 'Nov 2024', text: 'The samba night at Pedra do Sal was pure energy. We danced until 3am with locals. Best night of my life.', tripHighlight: 'Samba Night' },
+  ],
+  vietnam: [
+    { name: 'Tom & Rachel W.', avatar: '👫', rating: 5, date: 'Nov 2025', text: 'The motorbike food tour in Hanoi was insane — we ate at 8 stops and everything was incredible. Ha Long Bay was surreal.', tripHighlight: 'Motorbike Food Tour' },
+    { name: 'Priya S.', avatar: '👩', rating: 5, date: 'Mar 2025', text: 'Had a dress custom-made in Hoi An in 24 hours for $40. The lantern-making workshop was so peaceful. Vietnam stole my heart.', tripHighlight: 'Hoi An Tailoring' },
+  ],
+  ecuador: [
+    { name: 'The Johnson Family', avatar: '👨‍👩‍👧‍👦', rating: 5, date: 'Jan 2025', text: 'Our kids swam with sea lions and saw giant tortoises up close. The Galápagos exceeded every expectation. Truly once-in-a-lifetime.', tripHighlight: 'Galápagos Wildlife' },
+    { name: 'Mark D.', avatar: '👨', rating: 5, date: 'Feb 2025', text: 'Diving with hammerhead sharks was the most exhilarating thing I have ever done. Maharaja organized everything flawlessly.', tripHighlight: 'Scuba Diving' },
+  ],
+  patagonia: [
+    { name: 'Alex & Jordan B.', avatar: '👫', rating: 5, date: 'Jan 2025', text: 'Standing at the base of Torres del Paine after a 10-hour hike was the most rewarding moment of our lives. The puma tracking was surreal.', tripHighlight: 'Torres Hike' },
+    { name: 'Helen W.', avatar: '👩', rating: 5, date: 'Dec 2024', text: 'The glacier kayaking was breathtaking. Watching ice calve from Perito Moreno while drinking Malbec? Perfection.', tripHighlight: 'Glacier Kayaking' },
+  ],
+  sanfrancisco: [
+    { name: 'Kevin C.', avatar: '👨', rating: 5, date: 'Dec 2025', text: 'The Napa Valley wine tour was worth the trip alone. Three incredible wineries, barrel tasting, and a gourmet lunch overlooking the vineyards.', tripHighlight: 'Napa Valley' },
+    { name: 'Samantha & Chris T.', avatar: '👫', rating: 5, date: 'Dec 2024', text: 'Biking across the Golden Gate at sunset was iconic. The Mission District taco crawl rivaled anything we had in Mexico.', tripHighlight: 'Golden Gate Bike' },
+  ],
+  egypt: [
+    { name: 'Robert & Susan H.', avatar: '👫', rating: 5, date: 'Feb 2025', text: 'Dr. Ahmed brought the pyramids to life in a way no guidebook ever could. The sunrise camel ride was pure magic.', tripHighlight: 'Pyramids Tour' },
+    { name: 'Aisha K.', avatar: '👩', rating: 5, date: 'Mar 2025', text: 'The hot air balloon over Luxor at sunrise was the most beautiful thing I have ever seen. The Valley of the Kings left me speechless.', tripHighlight: 'Luxor Balloon' },
+    { name: 'The Chen Family', avatar: '👨‍👩‍👧‍👦', rating: 5, date: 'Feb 2025', text: 'Red Sea diving was incredible — our kids (certified divers) saw sea turtles and a dolphin pod. Egypt has it all.', tripHighlight: 'Red Sea Diving' },
+  ],
+  jordan: [
+    { name: 'Daniel & Mia F.', avatar: '👫', rating: 5, date: 'Mar 2025', text: 'Walking through the Siq by candlelight with Bedouin music echoing off the walls was genuinely the most magical moment of our lives.', tripHighlight: 'Petra by Night' },
+    { name: 'Olivia N.', avatar: '👩', rating: 5, date: 'Apr 2025', text: 'Sleeping in a geodesic dome in Wadi Rum under a sky full of stars — I cried, it was so beautiful. Jordan is severely underrated.', tripHighlight: 'Wadi Rum Stars' },
+    { name: 'The Patel Family', avatar: '👨‍👩‍👧‍👦', rating: 5, date: 'Mar 2025', text: 'The mansaf was incredible, the Dead Sea was hilarious (everyone floats!), and Petra took our breath away. 10/10.', tripHighlight: 'Petra & Dead Sea' },
+  ],
+};
+
+export const destinationExperts = {
+  japan: { name: 'Yuki Tanaka', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80', title: 'Japan Specialist', bio: 'Born in Osaka, lived in Tokyo for 15 years. Former food magazine editor. Yuki has designed 200+ custom Japan itineraries and knows every hidden izakaya in Shinjuku.', languages: ['Japanese', 'English'], trips: 214, rating: 4.9 },
+  brazil: { name: 'Lucas Ferreira', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80', title: 'Brazil Specialist', bio: 'Carioca born and raised. Former professional surfer turned travel curator. Lucas knows Rio like the back of his hand — from hidden beaches to the best samba spots.', languages: ['Portuguese', 'English', 'Spanish'], trips: 156, rating: 4.9 },
+  vietnam: { name: 'Linh Nguyen', photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80', title: 'Vietnam Specialist', bio: 'Hanoi native, former chef. Linh has spent 10 years crafting immersive Vietnam experiences that go beyond the tourist trail — street food, motorbike tours, and hidden villages.', languages: ['Vietnamese', 'English', 'French'], trips: 189, rating: 5.0 },
+  ecuador: { name: 'Carlos Mendoza', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80', title: 'Ecuador & Galápagos Specialist', bio: 'Marine biologist turned travel expert. Carlos has visited the Galápagos 50+ times and knows every dive site, hiking trail, and wildlife hotspot on each island.', languages: ['Spanish', 'English'], trips: 178, rating: 4.9 },
+  patagonia: { name: 'Valentina Ríos', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80', title: 'Patagonia Specialist', bio: 'Former mountaineering guide, now dedicated to designing unforgettable Patagonia adventures. Valentina has summited every major peak in Torres del Paine.', languages: ['Spanish', 'English'], trips: 134, rating: 5.0 },
+  sanfrancisco: { name: 'David Park', photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80', title: 'California Specialist', bio: 'Former tech founder turned full-time travel curator. David designs SF experiences that blend tech culture, foodie adventures, and outdoor exploration.', languages: ['English', 'Korean'], trips: 97, rating: 4.8 },
+  egypt: { name: 'Dr. Nadia Mahmoud', photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80', title: 'Egypt Specialist', bio: 'PhD in Egyptology from Cairo University. Nadia has designed immersive Egypt trips for 12 years, with deep relationships with guides across Cairo, Luxor, and the Red Sea.', languages: ['Arabic', 'English', 'French'], trips: 203, rating: 5.0 },
+  jordan: { name: 'Rami Khoury', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80', title: 'Jordan Specialist', bio: 'Jordanian historian and licensed guide. Rami has deep Bedouin connections in Wadi Rum and Petra, and has crafted 150+ bespoke Jordan journeys.', languages: ['Arabic', 'English'], trips: 152, rating: 4.9 },
+};
+
+export const tripInclusions = {
+  included: [
+    'Round-trip flights (economy or business class)',
+    'All hotel accommodations',
+    'Private airport transfers',
+    'Experiences marked as "Included"',
+    'English-speaking local guides',
+    '24/7 in-trip emergency support',
+    'Detailed digital itinerary via email',
+    'Pre-departure travel consultation',
+  ],
+  notIncluded: [
+    'Travel visa fees',
+    'Travel insurance (available as add-on)',
+    'Meals not specified in itinerary',
+    'Personal expenses & souvenirs',
+    'Optional experiences not selected',
+    'Gratuities for guides & drivers',
+    'Airport lounge access',
+    'PCR/COVID tests if required',
+  ],
+};
+
+export const awards = [
+  { name: 'Travel + Leisure', badge: 'World\'s Best 2025', icon: '🏆' },
+  { name: 'Condé Nast Traveler', badge: 'Readers\' Choice', icon: '⭐' },
+  { name: 'Trustpilot', badge: '4.9 / 5 Stars', icon: '🌟' },
+  { name: 'National Geographic', badge: 'Recommended', icon: '🌍' },
+];
+
+export const tripProtectionPlans = [
+  { id: 'none', name: 'No Protection', price: 0, description: 'Travel at your own risk.' },
+  { id: 'basic', name: 'Basic Protection', pricePercent: 5, description: 'Trip cancellation up to 48hrs before departure. Medical emergencies up to $25,000.', features: ['Trip cancellation (48hrs+)', 'Medical emergency ($25K)', 'Lost luggage ($1,500)', '24/7 hotline'] },
+  { id: 'premium', name: 'Premium Protection', pricePercent: 8, description: 'Cancel for any reason. Full medical, evacuation, and gear coverage.', features: ['Cancel for any reason', 'Full medical ($100K)', 'Emergency evacuation', 'Lost/delayed luggage ($3K)', 'Trip delay coverage', 'Adventure sports covered', '24/7 concierge'], recommended: true },
+];

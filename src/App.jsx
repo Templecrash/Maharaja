@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { trips, personalityLabels } from './data/trips';
+import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
 import './App.css';
 
 function LandingPage({ onSelectTrip }) {
@@ -7,6 +7,8 @@ function LandingPage({ onSelectTrip }) {
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
   const [showSignUp, setShowSignUp] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState(null);
+  const [showChat, setShowChat] = useState(false);
 
   const months = useMemo(() => [...new Set(trips.map(t => t.departureDate.split(' ')[0]))], []);
   const continents = useMemo(() => [...new Set(trips.map(t => t.continent))], []);
@@ -15,9 +17,10 @@ function LandingPage({ onSelectTrip }) {
     return trips.filter(trip => {
       if (selectedMonth && !trip.departureDate.startsWith(selectedMonth)) return false;
       if (selectedContinent && trip.continent !== selectedContinent) return false;
+      if (selectedStyle && !(tripStyles[trip.id] || []).includes(selectedStyle)) return false;
       return true;
     });
-  }, [selectedMonth, selectedContinent]);
+  }, [selectedMonth, selectedContinent, selectedStyle]);
 
   return (
     <div className="landing">
@@ -27,6 +30,17 @@ function LandingPage({ onSelectTrip }) {
           <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
+        <div className="awards-bar">
+          {awards.map((a, i) => (
+            <div key={i} className="award-badge">
+              <span className="award-icon">{a.icon}</span>
+              <div className="award-text">
+                <strong>{a.name}</strong>
+                <span>{a.badge}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </header>
 
       <div className="filter-bar">
@@ -56,6 +70,15 @@ function LandingPage({ onSelectTrip }) {
         </div>
       </div>
 
+      <div className="style-pills">
+        <span className="style-pills-label">Travel Style:</span>
+        {travelStyles.map(s => (
+          <button key={s.id} className={`style-pill ${selectedStyle === s.id ? 'active' : ''}`} onClick={() => setSelectedStyle(selectedStyle === s.id ? null : s.id)}>
+            {s.emoji} {s.label}
+          </button>
+        ))}
+      </div>
+
       {filtered.length === 0 ? (
         <div className="no-results">No trips match your filters. Try adjusting your selection.</div>
       ) : (
@@ -80,6 +103,62 @@ function LandingPage({ onSelectTrip }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      <div className="why-us-section">
+        <h2>Why Maharaja?</h2>
+        <div className="why-us-grid">
+          <div className="why-us-card">
+            <div className="why-us-icon">🧑‍✈️</div>
+            <h3>Private Guides</h3>
+            <p>Every trip includes expert local guides who know hidden gems no guidebook covers.</p>
+          </div>
+          <div className="why-us-card">
+            <div className="why-us-icon">✏️</div>
+            <h3>Fully Customizable</h3>
+            <p>Every itinerary is a starting point. Add, remove, or swap anything before you book.</p>
+          </div>
+          <div className="why-us-card">
+            <div className="why-us-icon">📞</div>
+            <h3>24/7 Support</h3>
+            <p>Our team is available around the clock while you travel — one call away, always.</p>
+          </div>
+          <div className="why-us-card">
+            <div className="why-us-icon">🛡️</div>
+            <h3>Trip Protection</h3>
+            <p>Optional insurance plans cover cancellations, medical emergencies, and lost luggage.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="phone-cta-bar">
+        <div className="phone-cta-content">
+          <span className="phone-cta-icon">📞</span>
+          <div className="phone-cta-text">
+            <strong>Talk to a Destination Expert</strong>
+            <span>Call us at <a href="tel:+18889030001">1-888-903-0001</a> or chat live</span>
+          </div>
+          <button className="btn-live-chat" onClick={() => setShowChat(true)}>Live Chat</button>
+        </div>
+      </div>
+
+      {showChat && (
+        <div className="chat-widget">
+          <div className="chat-header">
+            <span>💬 Live Chat</span>
+            <button className="chat-close" onClick={() => setShowChat(false)}>×</button>
+          </div>
+          <div className="chat-body">
+            <div className="chat-message bot">
+              <strong>Maharaja</strong>
+              <p>Hi! 👋 How can we help you plan your perfect trip?</p>
+            </div>
+          </div>
+          <div className="chat-input-bar">
+            <input type="text" placeholder="Type a message..." />
+            <button className="chat-send">→</button>
+          </div>
         </div>
       )}
 
@@ -138,6 +217,8 @@ function TripPage({ trip, onBack }) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareForm, setShareForm] = useState({ friendName: '', friendEmail: '', yourName: '', message: '' });
   const [shareSent, setShareSent] = useState(false);
+  const [selectedProtection, setSelectedProtection] = useState('none');
+  const [showItinerary, setShowItinerary] = useState(false);
 
   const addPassenger = useCallback(() => {
     setPassengers(prev => [...prev, { name: '', dob: '', passport: '', nationality: '' }]);
@@ -194,7 +275,10 @@ function TripPage({ trip, onBack }) {
   }, [trip, toggled]);
 
   const currentFlightPrice = flightUpgrade ? trip.flightBusiness.price : trip.flightPrice;
-  const totalPrice = currentFlightPrice + stayTotal + addOnsTotal;
+  const subtotal = currentFlightPrice + stayTotal + addOnsTotal;
+  const protectionPlan = tripProtectionPlans.find(p => p.id === selectedProtection);
+  const protectionCost = protectionPlan?.pricePercent ? Math.round(subtotal * protectionPlan.pricePercent / 100) : 0;
+  const totalPrice = subtotal + protectionCost;
 
   return (
     <div className="trip-page">
@@ -355,6 +439,117 @@ function TripPage({ trip, onBack }) {
           </div>
           );
         })}
+
+        {/* Day-by-Day Itinerary */}
+        <div className="itinerary-section">
+          <div className="itinerary-header" onClick={() => setShowItinerary(!showItinerary)}>
+            <h2>📅 Day-by-Day Itinerary</h2>
+            <span className="itinerary-toggle">{showItinerary ? '▲' : '▼'}</span>
+          </div>
+          {showItinerary && dayByDay[trip.id] && (
+            <div className="itinerary-timeline">
+              {dayByDay[trip.id].map((day, i) => (
+                <div key={i} className="itinerary-day">
+                  <div className="itinerary-day-marker">
+                    <span className="itinerary-day-icon">{day.icon}</span>
+                    <span className="itinerary-day-num">Day {day.day}</span>
+                  </div>
+                  <div className="itinerary-day-content">
+                    <div className="itinerary-day-location">{day.location}</div>
+                    <h4>{day.title}</h4>
+                    <p>{day.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Trip Protection */}
+        <div className="protection-section">
+          <h2>🛡️ Trip Protection</h2>
+          <p className="protection-subtitle">Protect your investment with optional travel insurance.</p>
+          <div className="protection-options">
+            {tripProtectionPlans.map(plan => (
+              <div key={plan.id} className={`protection-card ${selectedProtection === plan.id ? 'selected' : ''} ${plan.recommended ? 'recommended' : ''}`} onClick={() => setSelectedProtection(plan.id)}>
+                {plan.recommended && <div className="protection-badge">Recommended</div>}
+                <div className="protection-radio">
+                  <div className={`radio-dot ${selectedProtection === plan.id ? 'on' : ''}`} />
+                </div>
+                <div className="protection-info">
+                  <strong>{plan.name}</strong>
+                  <span className="protection-price">
+                    {plan.price === 0 ? 'Free' : `+${plan.pricePercent}% ($${Math.round(subtotal * plan.pricePercent / 100)})`}
+                  </span>
+                  <p>{plan.description}</p>
+                  {plan.features && (
+                    <ul className="protection-features">
+                      {plan.features.map((f, i) => <li key={i}>✓ {f}</li>)}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* What's Included / Not Included */}
+        <div className="inclusions-section">
+          <h2>📋 What's Included</h2>
+          <div className="inclusions-grid">
+            <div className="inclusions-col included">
+              <h3>✅ Included</h3>
+              <ul>{tripInclusions.included.map((item, i) => <li key={i}>{item}</li>)}</ul>
+            </div>
+            <div className="inclusions-col not-included">
+              <h3>❌ Not Included</h3>
+              <ul>{tripInclusions.notIncluded.map((item, i) => <li key={i}>{item}</li>)}</ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Destination Expert */}
+        {destinationExperts[trip.id] && (
+          <div className="expert-section">
+            <h2>🧑‍✈️ Your Destination Expert</h2>
+            <div className="expert-card">
+              <img src={destinationExperts[trip.id].photo} alt={destinationExperts[trip.id].name} className="expert-photo" />
+              <div className="expert-info">
+                <h3>{destinationExperts[trip.id].name}</h3>
+                <span className="expert-title">{destinationExperts[trip.id].title}</span>
+                <p>{destinationExperts[trip.id].bio}</p>
+                <div className="expert-stats">
+                  <span>⭐ {destinationExperts[trip.id].rating}</span>
+                  <span>✈️ {destinationExperts[trip.id].trips} trips designed</span>
+                  <span>🗣️ {destinationExperts[trip.id].languages.join(', ')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Traveler Reviews */}
+        {tripReviews[trip.id] && (
+          <div className="reviews-section">
+            <h2>⭐ Traveler Reviews</h2>
+            <div className="reviews-grid">
+              {tripReviews[trip.id].map((review, i) => (
+                <div key={i} className="review-card">
+                  <div className="review-header">
+                    <span className="review-avatar">{review.avatar}</span>
+                    <div className="review-meta">
+                      <strong>{review.name}</strong>
+                      <span className="review-date">{review.date}</span>
+                    </div>
+                    <div className="review-stars">{'★'.repeat(review.rating)}</div>
+                  </div>
+                  <p className="review-text">"{review.text}"</p>
+                  <span className="review-highlight">📍 {review.tripHighlight}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="share-cta-section">
           <div className="share-cta-icon">✉️</div>
