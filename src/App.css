@@ -1110,6 +1110,47 @@ body {
   font-weight: 700;
 }
 
+/* Gallery */
+.activity-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.gallery-thumb {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.gallery-thumb:hover {
+  transform: scale(1.03);
+}
+
+/* Experience card meta row */
+.experience-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.experience-details-link {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.experience-details-link:hover {
+  opacity: 0.7;
+}
+
 /* Host Card */
 .activity-host-card {
   display: flex;

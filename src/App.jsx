@@ -337,7 +337,10 @@ function TripPage({ trip, onBack }) {
                         {exp.popular && <span className="popular-badge">{exp.popularPercent}% add this</span>}
                       </div>
                       <p className="experience-desc">{exp.description}</p>
-                      {exp.duration && <span className="experience-duration">{exp.duration}</span>}
+                      <div className="experience-card-meta">
+                        {exp.duration && <span className="experience-duration">{exp.duration}</span>}
+                        <span className="experience-details-link" onClick={(e) => { e.stopPropagation(); setSelectedExperience(exp); }}>View details →</span>
+                      </div>
                     </div>
                   </div>
                   <div className="experience-price">
@@ -393,6 +396,17 @@ function TripPage({ trip, onBack }) {
                       <li key={i}>{item}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {selectedExperience.gallery && selectedExperience.gallery.length > 0 && (
+                <div className="activity-detail-section">
+                  <h3>Photos</h3>
+                  <div className="activity-gallery">
+                    {selectedExperience.gallery.map((img, i) => (
+                      <div key={i} className="gallery-thumb" style={{ backgroundImage: `url(${img})` }} />
+                    ))}
+                  </div>
                 </div>
               )}
 
