@@ -1,8 +1,16 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import ArticlePage from './ArticlePage.jsx';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+const ARTICLE_HASH = '#/guide/how-to-plan-a-fixed-departure-guided-trip';
+
+function getViewFromHash() {
+  if (window.location.hash === ARTICLE_HASH) return 'article';
+  return 'landing';
+}
+
+function LandingPage({ onSelectTrip, onOpenArticle }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -27,7 +35,10 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <nav className="landing-nav">
+            <button className="nav-link" onClick={onOpenArticle}>How to Plan a Trip</button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </nav>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -786,13 +797,43 @@ function TripPage({ trip, onBack }) {
 
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [view, setView] = useState(() => getViewFromHash());
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setSelectedTrip(null);
+      setView(getViewFromHash());
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const openArticle = () => {
+    if (window.location.hash !== ARTICLE_HASH) {
+      window.location.hash = ARTICLE_HASH;
+    }
+    setView('article');
+    setSelectedTrip(null);
+    window.scrollTo(0, 0);
+  };
+
+  const browseTrips = () => {
+    if (window.location.hash) {
+      window.location.hash = '';
+    }
+    setView('landing');
+    setSelectedTrip(null);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="app">
-      {selectedTrip ? (
+      {view === 'article' ? (
+        <ArticlePage onBrowseTrips={browseTrips} />
+      ) : selectedTrip ? (
         <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={setSelectedTrip} onOpenArticle={openArticle} />
       )}
     </div>
   );
