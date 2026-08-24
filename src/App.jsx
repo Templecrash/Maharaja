@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { buildTripStructuredData } from './data/structuredData';
 import './App.css';
 
 function LandingPage({ onSelectTrip }) {
@@ -282,6 +283,10 @@ function TripPage({ trip, onBack }) {
 
   return (
     <div className="trip-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildTripStructuredData(trip)) }}
+      />
       <div className="trip-hero" style={{ backgroundImage: `url(${trip.heroImage})` }}>
         <button className="back-btn" onClick={onBack}>&larr; All Trips</button>
         <div className="trip-hero-content">
@@ -356,7 +361,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map(segment => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
