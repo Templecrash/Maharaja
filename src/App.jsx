@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { track } from './analytics.js';
 import './App.css';
 
 function LandingPage({ onSelectTrip }) {
@@ -27,7 +28,7 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <button className="signup-btn" onClick={() => { track('signup_started'); setShowSignUp(true); }}>Sign Up</button>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -84,7 +85,7 @@ function LandingPage({ onSelectTrip }) {
       ) : (
         <div className="trip-grid">
           {filtered.map(trip => (
-            <div key={trip.id} className="trip-card" onClick={() => onSelectTrip(trip)}>
+            <div key={trip.id} className="trip-card" onClick={() => { track('trip_viewed', { trip_id: trip.id, destination: trip.country, departure_date: trip.departureDate, duration: trip.duration, base_price: trip.basePrice }); onSelectTrip(trip); }}>
               <div className="trip-card-image" style={{ backgroundImage: `url(${trip.heroImage})` }}>
                 <div className="trip-card-overlay">
                   <span className="trip-card-flag">{trip.flag}</span>
@@ -139,7 +140,7 @@ function LandingPage({ onSelectTrip }) {
             <strong>Talk to a Destination Expert</strong>
             <span>Call us at <a href="tel:+18889030001">1-888-903-0001</a> or chat live</span>
           </div>
-          <button className="btn-live-chat" onClick={() => setShowChat(true)}>Live Chat</button>
+          <button className="btn-live-chat" onClick={() => { track('live_chat_opened'); setShowChat(true); }}>Live Chat</button>
         </div>
       </div>
 
@@ -234,9 +235,10 @@ function TripPage({ trip, onBack }) {
 
   const toggleExperience = useCallback((id, included) => {
     if (included) return;
+    track('experience_toggled', { trip_id: trip.id, experience_id: id, toggled_on: !toggled[id] });
     setToggled(prev => ({ ...prev, [id]: !prev[id] }));
     setActivePersonality(null);
-  }, []);
+  }, [trip, toggled]);
 
   const applyPersonality = useCallback((key) => {
     if (activePersonality === key) {
@@ -309,8 +311,8 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
         <div className="trip-sticky-right">
-          <button className="btn-custom" onClick={() => setShowCustomModal(true)}>Customize with Expert</button>
-          <button className="btn-book" onClick={() => setShowBookModal(true)}>Book Now</button>
+          <button className="btn-custom" onClick={() => { track('customize_request_started', { trip_id: trip.id }); setShowCustomModal(true); }}>Customize with Expert</button>
+          <button className="btn-book" onClick={() => { track('book_started', { trip_id: trip.id, total_price: totalPrice }); setShowBookModal(true); }}>Book Now</button>
         </div>
       </div>
 
@@ -331,7 +333,7 @@ function TripPage({ trip, onBack }) {
         <div className="flight-selector">
           <div
             className={`flight-option ${!flightUpgrade ? 'selected' : ''}`}
-            onClick={() => setFlightUpgrade(false)}
+            onClick={() => { track('flight_grade_selected', { trip_id: trip.id, grade: 'economy', price: trip.flightPrice }); setFlightUpgrade(false); }}
           >
             <div className={`flight-radio ${!flightUpgrade ? 'checked' : ''}`} />
             <div className="flight-option-info">
@@ -342,7 +344,7 @@ function TripPage({ trip, onBack }) {
           </div>
           <div
             className={`flight-option upgrade ${flightUpgrade ? 'selected' : ''}`}
-            onClick={() => setFlightUpgrade(true)}
+            onClick={() => { track('flight_grade_selected', { trip_id: trip.id, grade: 'business', price: trip.flightBusiness.price }); setFlightUpgrade(true); }}
           >
             <div className={`flight-radio ${flightUpgrade ? 'checked' : ''}`} />
             <div className="flight-option-info">
@@ -356,7 +358,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -374,7 +376,7 @@ function TripPage({ trip, onBack }) {
                 <div className="hotel-card-images">
                   <div
                     className={`hotel-option ${!isUpgraded ? 'selected' : ''}`}
-                    onClick={() => setHotelUpgrades(prev => ({ ...prev, [hotelIndex]: false }))}
+                    onClick={() => { track('hotel_grade_selected', { trip_id: trip.id, hotel: hotel.base.name, grade: 'standard' }); setHotelUpgrades(prev => ({ ...prev, [hotelIndex]: false })); }}
                   >
                     <div className="hotel-option-image" style={{ backgroundImage: `url(${hotel.base.image})` }} />
                     <div className="hotel-option-info">
@@ -386,7 +388,7 @@ function TripPage({ trip, onBack }) {
                   </div>
                   <div
                     className={`hotel-option upgrade ${isUpgraded ? 'selected' : ''}`}
-                    onClick={() => setHotelUpgrades(prev => ({ ...prev, [hotelIndex]: true }))}
+                    onClick={() => { track('hotel_grade_selected', { trip_id: trip.id, hotel: hotel.upgrade.name, grade: 'upgrade' }); setHotelUpgrades(prev => ({ ...prev, [hotelIndex]: true })); }}
                   >
                     <div className="hotel-option-image" style={{ backgroundImage: `url(${hotel.upgrade.image})` }} />
                     <div className="hotel-option-info">
@@ -442,7 +444,7 @@ function TripPage({ trip, onBack }) {
 
         {/* Day-by-Day Itinerary */}
         <div className="itinerary-section">
-          <div className="itinerary-header" onClick={() => setShowItinerary(!showItinerary)}>
+          <div className="itinerary-header" onClick={() => { track('itinerary_expanded', { trip_id: trip.id, expanded: !showItinerary }); setShowItinerary(!showItinerary); }}>
             <h2>📅 Day-by-Day Itinerary</h2>
             <span className="itinerary-toggle">{showItinerary ? '▲' : '▼'}</span>
           </div>
@@ -471,7 +473,7 @@ function TripPage({ trip, onBack }) {
           <p className="protection-subtitle">Protect your investment with optional travel insurance.</p>
           <div className="protection-options">
             {tripProtectionPlans.map(plan => (
-              <div key={plan.id} className={`protection-card ${selectedProtection === plan.id ? 'selected' : ''} ${plan.recommended ? 'recommended' : ''}`} onClick={() => setSelectedProtection(plan.id)}>
+              <div key={plan.id} className={`protection-card ${selectedProtection === plan.id ? 'selected' : ''} ${plan.recommended ? 'recommended' : ''}`} onClick={() => { track('protection_plan_selected', { trip_id: trip.id, plan_id: plan.id, plan_name: plan.name }); setSelectedProtection(plan.id); }}>
                 {plan.recommended && <div className="protection-badge">Recommended</div>}
                 <div className="protection-radio">
                   <div className={`radio-dot ${selectedProtection === plan.id ? 'on' : ''}`} />
@@ -561,7 +563,7 @@ function TripPage({ trip, onBack }) {
         <div className="custom-cta-section">
           <h3>Want this trip tailored to you?</h3>
           <p>Our travel experts can customize dates, hotels, activities — anything you need.</p>
-          <button className="btn-custom-large" onClick={() => setShowCustomModal(true)}>Talk to a Travel Expert</button>
+          <button className="btn-custom-large" onClick={() => { track('customize_request_started', { trip_id: trip.id }); setShowCustomModal(true); }}>Talk to a Travel Expert</button>
         </div>
       </div>
 
@@ -680,7 +682,7 @@ function TripPage({ trip, onBack }) {
               <>
                 <h2>Share {trip.country} Trip</h2>
                 <p className="share-subtitle">Send your friend the full trip details. When they book, you <strong>both save 5%</strong> on your trip.</p>
-                <form onSubmit={e => { e.preventDefault(); setShareSent(true); }}>
+                <form onSubmit={e => { e.preventDefault(); track('share_invite_submitted', { trip_id: trip.id }); setShareSent(true); }}>
                   <div className="booking-section">
                     <h3>Your Friend</h3>
                     <input type="text" placeholder="Friend's name" required value={shareForm.friendName} onChange={e => setShareForm(f => ({ ...f, friendName: e.target.value }))} />
