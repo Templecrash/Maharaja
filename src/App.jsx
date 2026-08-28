@@ -1,6 +1,75 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { SITE_URL, tripSlugs, tripSeo, productSchema, breadcrumbSchema, websiteSchema } from './data/seo';
 import './App.css';
+
+function getPath() {
+  return window.location.pathname.length > 1 ? window.location.pathname.replace(/\/+$/, '') : '/';
+}
+
+function normalizePath() {
+  const path = getPath();
+  return path === '/trips' ? '/' : path;
+}
+
+function setMeta(name, content) {
+  let el = document.head.querySelector(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute('name', name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+
+function setCanonical(href) {
+  let el = document.head.querySelector('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement('link');
+    el.setAttribute('rel', 'canonical');
+    document.head.appendChild(el);
+  }
+  el.setAttribute('href', href);
+}
+
+function setJsonLd(id, schema) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('script');
+    el.setAttribute('type', 'application/ld+json');
+    el.id = id;
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(schema);
+}
+
+function applyHead(trip) {
+  if (trip) {
+    const seo = tripSeo[trip.id];
+    document.title = seo.title;
+    setMeta('description', seo.metaDescription);
+    setCanonical(`${SITE_URL}/trips/${tripSlugs[trip.id]}/`);
+    setJsonLd('ld-product', productSchema(trip));
+    setJsonLd('ld-breadcrumb', breadcrumbSchema(trip));
+    document.getElementById('ld-website')?.remove();
+  } else {
+    document.title = 'Maharaja — Curated Travel';
+    setMeta('description', 'Curated, fixed-departure guided trips that bundle flights, hotels, transfers, guides and experiences into one all-in price.');
+    setCanonical(`${SITE_URL}/`);
+    setJsonLd('ld-website', websiteSchema);
+    document.getElementById('ld-product')?.remove();
+    document.getElementById('ld-breadcrumb')?.remove();
+  }
+}
+
+function resolvePath(path) {
+  const match = path.match(/^\/trips\/([^/]+)$/);
+  if (match) {
+    const trip = trips.find(t => tripSlugs[t.id] === match[1]);
+    if (trip) return { view: 'trip', trip };
+  }
+  return { view: 'home', trip: null };
+}
 
 function LandingPage({ onSelectTrip }) {
   const [travelers, setTravelers] = useState(2);
@@ -84,7 +153,7 @@ function LandingPage({ onSelectTrip }) {
       ) : (
         <div className="trip-grid">
           {filtered.map(trip => (
-            <div key={trip.id} className="trip-card" onClick={() => onSelectTrip(trip)}>
+            <a key={trip.id} className="trip-card" href={`/trips/${tripSlugs[trip.id]}/`} onClick={(e) => { e.preventDefault(); onSelectTrip(trip); }}>
               <div className="trip-card-image" style={{ backgroundImage: `url(${trip.heroImage})` }}>
                 <div className="trip-card-overlay">
                   <span className="trip-card-flag">{trip.flag}</span>
@@ -101,7 +170,7 @@ function LandingPage({ onSelectTrip }) {
                   <span className="trip-card-date">{trip.departureDate}</span>
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       )}
@@ -190,6 +259,7 @@ function LandingPage({ onSelectTrip }) {
 }
 
 function TripPage({ trip, onBack }) {
+  const seo = tripSeo[trip.id];
   const allExperiences = useMemo(() => {
     const map = {};
     trip.segments.forEach(seg => {
@@ -283,15 +353,15 @@ function TripPage({ trip, onBack }) {
   return (
     <div className="trip-page">
       <div className="trip-hero" style={{ backgroundImage: `url(${trip.heroImage})` }}>
-        <button className="back-btn" onClick={onBack}>&larr; All Trips</button>
+        <a className="back-btn" href="/" onClick={(e) => { e.preventDefault(); onBack(); }}>&larr; All Trips</a>
         <div className="trip-hero-content">
-          <h1>{trip.flag} {trip.country}: {trip.title}</h1>
+          <h2 className="trip-hero-title">{trip.flag} {trip.country}: {trip.title}</h2>
           <p className="trip-hero-dates">{trip.departureDateFull}</p>
           <div className="trip-hero-spots">{trip.spotsLeft} spots left</div>
         </div>
       </div>
 
-      <div className="trip-sticky-bar">
+      <div className="trip-sticky-bar" id="trip-price">
         <div className="trip-sticky-left">
           <div className="price-breakdown">
             <span className="price-label">Flight + Stay</span>
@@ -315,6 +385,19 @@ function TripPage({ trip, onBack }) {
       </div>
 
       <div className="trip-content">
+        {seo && (
+          <div className="trip-seo-copy">
+            <h1 className="trip-seo-h1">{seo.h1}</h1>
+            <p className="trip-seo-paragraph">{seo.intro}</p>
+            <p className="trip-seo-paragraph">{seo.transparent}</p>
+            <h2 className="trip-seo-how-title">{seo.howTitle}</h2>
+            <ul className="trip-seo-how-list">
+              {seo.howBullets.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+            <p className="trip-seo-trust">{seo.trustNote}</p>
+            <a className="trip-seo-cta" href="#trip-price">See departures and live price &rarr;</a>
+          </div>
+        )}
         <div className="personality-bar">
           <span className="personality-label">Quick select:</span>
           {Object.entries(personalityLabels).map(([key, { label, emoji }]) => (
@@ -356,7 +439,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map(segment => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -785,14 +868,40 @@ function TripPage({ trip, onBack }) {
 }
 
 export default function App() {
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [path, setPath] = useState(normalizePath);
+
+  const navigate = useCallback((to) => {
+    if (to !== normalizePath()) {
+      window.history.pushState({}, '', to);
+      setPath(normalizePath());
+    }
+  }, []);
+
+  useEffect(() => {
+    const onPop = () => setPath(normalizePath());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  useEffect(() => {
+    if (window.location.pathname.replace(/\/+$/, '') === '/trips') {
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+
+  const resolved = resolvePath(path);
+
+  useEffect(() => {
+    applyHead(resolved.trip);
+    window.scrollTo(0, 0);
+  }, [path, resolved.trip]);
 
   return (
     <div className="app">
-      {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+      {resolved.trip ? (
+        <TripPage key={resolved.trip.id} trip={resolved.trip} onBack={() => navigate('/')} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={(trip) => navigate(`/trips/${tripSlugs[trip.id]}/`)} />
       )}
     </div>
   );
