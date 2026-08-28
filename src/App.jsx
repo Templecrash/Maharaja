@@ -1,6 +1,15 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import CompareTool from './components/CompareTool';
 import './App.css';
+
+function getHashRoute() {
+  const raw = window.location.hash.replace(/^#/, '');
+  const queryIndex = raw.indexOf('?');
+  const path = queryIndex === -1 ? raw : raw.slice(0, queryIndex);
+  const query = queryIndex === -1 ? '' : raw.slice(queryIndex + 1);
+  return { path: path || '/', query: new URLSearchParams(query) };
+}
 
 function LandingPage({ onSelectTrip }) {
   const [travelers, setTravelers] = useState(2);
@@ -27,7 +36,12 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <div className="landing-top-actions">
+            <button className="compare-nav-link" onClick={() => { window.location.hash = '#/compare'; }}>
+              Compare Trip Prices
+            </button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </div>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -105,6 +119,14 @@ function LandingPage({ onSelectTrip }) {
           ))}
         </div>
       )}
+
+      <div className="compare-entry-banner" onClick={() => { window.location.hash = '#/compare'; }} role="link" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.hash = '#/compare'; } }}>
+        <div className="compare-entry-text">
+          <strong>Planning a trip? Compare the real all-in price.</strong>
+          <span>Tour operators quote a per-person "from" price — then add flights and extras. Enter your own numbers for an honest side-by-side.</span>
+        </div>
+        <span className="compare-entry-cta">Open the All-In Trip Price Compare →</span>
+      </div>
 
       <div className="why-us-section">
         <h2>Why Maharaja?</h2>
@@ -356,7 +378,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map(segment => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -786,6 +808,21 @@ function TripPage({ trip, onBack }) {
 
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [route, setRoute] = useState(getHashRoute);
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(getHashRoute());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  if (route.path.startsWith('/compare')) {
+    return (
+      <div className="app">
+        <CompareTool params={route.query} onBrowseTrips={() => { window.location.hash = '#/'; }} />
+      </div>
+    );
+  }
 
   return (
     <div className="app">
