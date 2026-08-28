@@ -1,8 +1,9 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import GuidePage from './GuidePage';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+function LandingPage({ onSelectTrip, onOpenGuide }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -27,7 +28,10 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <div className="landing-top-actions">
+            <button className="guide-link-btn" onClick={onOpenGuide}>Trip Pricing Guide</button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </div>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -105,6 +109,15 @@ function LandingPage({ onSelectTrip }) {
           ))}
         </div>
       )}
+
+      <div className="guide-teaser" onClick={onOpenGuide}>
+        <div className="guide-teaser-icon">📖</div>
+        <div className="guide-teaser-text">
+          <h3>Not sure what a tour quote really covers?</h3>
+          <p>Read our guide on what all-in guided trips include &mdash; and how to compare tour quotes fairly.</p>
+        </div>
+        <span className="guide-teaser-link">Read the guide &rarr;</span>
+      </div>
 
       <div className="why-us-section">
         <h2>Why Maharaja?</h2>
@@ -189,7 +202,7 @@ function LandingPage({ onSelectTrip }) {
   );
 }
 
-function TripPage({ trip, onBack }) {
+function TripPage({ trip, onBack, onOpenGuide }) {
   const allExperiences = useMemo(() => {
     const map = {};
     trip.segments.forEach(seg => {
@@ -356,7 +369,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -506,6 +519,9 @@ function TripPage({ trip, onBack }) {
               <ul>{tripInclusions.notIncluded.map((item, i) => <li key={i}>{item}</li>)}</ul>
             </div>
           </div>
+          <button className="inclusions-guide-link" onClick={onOpenGuide}>
+            Want to compare tour quotes fairly? Our guide on all-in pricing shows how &rarr;
+          </button>
         </div>
 
         {/* Destination Expert */}
@@ -786,13 +802,32 @@ function TripPage({ trip, onBack }) {
 
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="description"]');
+    if (showGuide) {
+      document.title = 'What an All-In Guided Trip Really Includes — Maharaja Guide';
+      if (meta) meta.setAttribute('content', 'How tour pricing is quoted, what all-in guided trips actually include, and how to compare tour quotes fairly. Read the Maharaja trip-cost transparency guide.');
+    } else if (selectedTrip) {
+      document.title = `${selectedTrip.country}: ${selectedTrip.title} — Maharaja`;
+      if (meta) meta.setAttribute('content', `Book Maharaja's ${selectedTrip.country} trip. Curated trips, fixed dates, one all-in price. ${selectedTrip.departureDateFull}.`);
+    } else {
+      document.title = 'Maharaja — Curated Travel';
+      if (meta) meta.setAttribute('content', 'Curated trips. Fixed dates. No guessing. All-in fixed-price guided trips to Japan, Brazil, Vietnam, the Galápagos, Patagonia, San Francisco, Egypt and Jordan.');
+    }
+  }, [showGuide, selectedTrip]);
+
+  const closeGuide = () => setShowGuide(false);
 
   return (
     <div className="app">
-      {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+      {showGuide ? (
+        <GuidePage onBrowseTrips={() => { closeGuide(); setSelectedTrip(null); }} />
+      ) : selectedTrip ? (
+        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} onOpenGuide={() => setShowGuide(true)} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={setSelectedTrip} onOpenGuide={() => setShowGuide(true)} />
       )}
     </div>
   );
