@@ -1,6 +1,9 @@
 export const trips = [
   {
     id: 'japan',
+    slug: 'japan',
+    metaTitle: 'Japan Guided Tour Package with Flights Included | Maharaja',
+    metaDescription: 'Book a fixed-departure Japan guided tour with flights from US gateways, hotels, transfers and English-speaking guides all in one price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'Asia',
     country: 'Japan',
     flag: '\u{1F1EF}\u{1F1F5}',
@@ -166,6 +169,9 @@ export const trips = [
   },
   {
     id: 'brazil',
+    slug: 'brazil',
+    metaTitle: 'Brazil Tour Package with Flights | Maharaja',
+    metaDescription: 'Book a fixed-departure Brazil guided vacation with flights, hotels, transfers and English-speaking guides in one transparent price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'South America',
     country: 'Brazil',
     flag: '\u{1F1E7}\u{1F1F7}',
@@ -273,6 +279,9 @@ export const trips = [
   },
   {
     id: 'vietnam',
+    slug: 'vietnam',
+    metaTitle: 'Vietnam Guided Tour Package All-Inclusive | Maharaja',
+    metaDescription: 'Book a fixed-departure Vietnam tour with flights included, hotels, private transfers and English-speaking guides in one price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'Asia',
     country: 'Vietnam',
     flag: '\u{1F1FB}\u{1F1F3}',
@@ -414,6 +423,9 @@ export const trips = [
   },
   {
     id: 'ecuador',
+    slug: 'galapagos',
+    metaTitle: 'Gal\u00e1pagos Guided Tour Package with Flights | Maharaja',
+    metaDescription: 'Book a 9-day fixed-departure Gal\u00e1pagos tour with flights, hotels, transfers and English-speaking guides in one price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'South America',
     country: 'Ecuador',
     flag: '\u{1F1EA}\u{1F1E8}',
@@ -555,6 +567,9 @@ export const trips = [
   },
   {
     id: 'patagonia',
+    slug: 'patagonia',
+    metaTitle: 'Patagonia Guided Tour Package with Flights | Maharaja',
+    metaDescription: 'Book a fixed-departure Patagonia adventure tour with flights, hotels, transfers and English-speaking guides in one price, plus optional business-class and premium upgrades. Departures October 2026\u2013March 2027.',
     continent: 'South America',
     country: 'Patagonia',
     flag: '\u{1F1E6}\u{1F1F7}',
@@ -696,6 +711,9 @@ export const trips = [
   },
   {
     id: 'sanfrancisco',
+    slug: 'san-francisco',
+    metaTitle: 'San Francisco Weekend Trip Package with Flights | Maharaja',
+    metaDescription: 'Book the 5-day fixed-departure San Francisco city break with flights, hotel, transfers, guides and experiences in one all-in price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'North America',
     country: 'San Francisco',
     flag: '\u{1F1FA}\u{1F1F8}',
@@ -801,6 +819,9 @@ export const trips = [
   },
   {
     id: 'egypt',
+    slug: 'egypt',
+    metaTitle: 'Egypt Guided Tour Package with Flights | Maharaja',
+    metaDescription: 'Book a fixed-departure Egypt guided tour with flights, hotels, transfers and English-speaking guides in one price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'Africa',
     country: 'Egypt',
     flag: '🇪🇬',
@@ -1003,6 +1024,9 @@ export const trips = [
   },
   {
     id: 'jordan',
+    slug: 'jordan',
+    metaTitle: 'Jordan Guided Tour Package | Maharaja',
+    metaDescription: 'Book a fixed-departure Jordan guided tour with flights, hotels, transfers and English-speaking guides in one price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
     continent: 'Middle East',
     country: 'Jordan',
     flag: '🇯🇴',
@@ -1457,3 +1481,13 @@ export const tripProtectionPlans = [
   { id: 'basic', name: 'Basic Protection', pricePercent: 5, description: 'Trip cancellation up to 48hrs before departure. Medical emergencies up to $25,000.', features: ['Trip cancellation (48hrs+)', 'Medical emergency ($25K)', 'Lost luggage ($1,500)', '24/7 hotline'] },
   { id: 'premium', name: 'Premium Protection', pricePercent: 8, description: 'Cancel for any reason. Full medical, evacuation, and gear coverage.', features: ['Cancel for any reason', 'Full medical ($100K)', 'Emergency evacuation', 'Lost/delayed luggage ($3K)', 'Trip delay coverage', 'Adventure sports covered', '24/7 concierge'], recommended: true },
 ];
+
+export const slugAliases = {
+  'egypt-jordan': 'egypt',
+};
+
+export const egyptJordanCombinedMeta = {
+  slug: 'egypt-jordan',
+  metaTitle: 'Egypt and Jordan Tour Package with Flights | Maharaja',
+  metaDescription: 'Book a fixed-departure Egypt and Jordan combined tour with flights, hotels, transfers and English-speaking guides in one price. Departures October 2026\u2013March 2027. Curated trips. Fixed dates. No guessing.',
+};

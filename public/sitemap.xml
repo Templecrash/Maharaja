@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://maharaja.example/</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/japan</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/brazil</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/vietnam</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/galapagos</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/patagonia</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/san-francisco</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/egypt</loc>
+  </url>
+  <url>
+    <loc>https://maharaja.example/trips/jordan</loc>
+  </url>
+</urlset>

@@ -1,5 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
-import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans, slugAliases } from './data/trips';
+import { applySeo } from './seo';
 import './App.css';
 
 function LandingPage({ onSelectTrip }) {
@@ -356,7 +357,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map(segment => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -787,12 +788,45 @@ function TripPage({ trip, onBack }) {
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
 
+  const tripBySlug = useMemo(() => {
+    const map = {};
+    trips.forEach(trip => { map[trip.slug] = trip; });
+    Object.entries(slugAliases).forEach(([alias, targetSlug]) => {
+      if (map[targetSlug]) map[alias] = map[targetSlug];
+    });
+    return map;
+  }, []);
+
+  useEffect(() => {
+    const resolveRoute = () => {
+      const match = window.location.hash.match(/^#\/trips\/([a-z0-9-]+)/i);
+      setSelectedTrip(match ? (tripBySlug[match[1].toLowerCase()] || null) : null);
+    };
+    resolveRoute();
+    window.addEventListener('hashchange', resolveRoute);
+    return () => window.removeEventListener('hashchange', resolveRoute);
+  }, [tripBySlug]);
+
+  useEffect(() => {
+    applySeo({ trip: selectedTrip });
+  }, [selectedTrip]);
+
+  const handleSelectTrip = useCallback((trip) => {
+    setSelectedTrip(trip);
+    window.location.hash = `/trips/${trip.slug}`;
+  }, []);
+
+  const handleBack = useCallback(() => {
+    setSelectedTrip(null);
+    window.location.hash = '/';
+  }, []);
+
   return (
     <div className="app">
       {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+        <TripPage trip={selectedTrip} onBack={handleBack} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={handleSelectTrip} />
       )}
     </div>
   );
