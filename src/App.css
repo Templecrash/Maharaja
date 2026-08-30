@@ -2415,3 +2415,367 @@ body {
   color: var(--accent);
   font-weight: 600;
 }
+
+/* ===== Landing Nav ===== */
+.landing-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 4px;
+  transition: color 0.15s;
+}
+
+.nav-link:hover {
+  color: var(--accent);
+}
+
+/* ===== Guide Banner (landing) ===== */
+.guide-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 48px 0 8px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  color: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.guide-banner-text {
+  flex: 1;
+}
+
+.guide-banner-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #fbbf24;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.guide-banner-text h3 {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.guide-banner-text p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.guide-banner-btn {
+  background: var(--accent);
+  white-space: nowrap;
+}
+
+/* ===== Guide Page ===== */
+.guide-page {
+  min-height: 100vh;
+}
+
+.guide-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  color: white;
+  padding: 72px 24px 56px;
+  text-align: center;
+}
+
+.guide-back-btn {
+  top: 24px;
+  left: 24px;
+}
+
+.guide-hero-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.guide-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #fbbf24;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.guide-hero h1 {
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.guide-hero p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.guide-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.guide-content p {
+  margin-bottom: 18px;
+}
+
+.guide-content h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 44px 0 16px;
+  padding-top: 16px;
+  border-top: 2px solid var(--text);
+}
+
+.guide-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.guide-requirement {
+  display: flex;
+  gap: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.guide-requirement-num {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-requirement strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.guide-requirement span {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.guide-feature-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.guide-feature-list li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 15px;
+}
+
+.guide-feature-list li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.guide-styles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.guide-style-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.guide-style-card strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.guide-style-card span {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.guide-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 24px 28px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.guide-checklist li {
+  position: relative;
+  padding-left: 34px;
+  font-size: 15px;
+}
+
+.guide-checklist li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+}
+
+.guide-destinations {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.guide-destination {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.guide-destination:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.guide-destination-image {
+  height: 130px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+}
+
+.guide-destination-flag {
+  font-size: 26px;
+}
+
+.guide-destination-info {
+  padding: 12px 14px;
+}
+
+.guide-destination-info strong {
+  font-size: 15px;
+}
+
+.guide-destination-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.guide-destination-price {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.guide-cta {
+  margin-top: 48px;
+  padding: 28px 32px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.guide-cta h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.guide-cta p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.guide-cta a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .guide-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+  }
+
+  .guide-hero {
+    padding: 64px 20px 40px;
+  }
+
+  .guide-hero h1 {
+    font-size: 26px;
+  }
+
+  .guide-content {
+    padding: 28px 16px 60px;
+  }
+
+  .landing-nav {
+    gap: 12px;
+  }
+}
+

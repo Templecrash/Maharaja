@@ -1,8 +1,28 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import GuidePage from './GuidePage';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+const GUIDE_HASH = '#/guide/how-to-choose-a-fixed-departure-guided-trip';
+
+function getRoute() {
+  const parts = window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  if (parts[0] === 'guide') return { name: 'guide' };
+  if (parts[0] === 'trips' && parts[1]) return { name: 'trip', id: parts[1] };
+  return { name: 'landing' };
+}
+
+function useHashRoute() {
+  const [route, setRoute] = useState(getRoute);
+  useEffect(() => {
+    const onHashChange = () => setRoute(getRoute());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  return route;
+}
+
+function LandingPage({ onSelectTrip, onOpenGuide }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -27,7 +47,10 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <div className="landing-nav">
+            <button className="nav-link" onClick={onOpenGuide}>Travel Guide</button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </div>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -105,6 +128,15 @@ function LandingPage({ onSelectTrip }) {
           ))}
         </div>
       )}
+
+      <div className="guide-banner">
+        <div className="guide-banner-text">
+          <span className="guide-banner-label">The Fixed-Departure Guide</span>
+          <h3>How to Choose a Fixed-Departure Guided Trip</h3>
+          <p>The flight question most guides skip — and the four checks that separate a real total from a touring price.</p>
+        </div>
+        <button className="btn-custom-large guide-banner-btn" onClick={onOpenGuide}>Read the Guide</button>
+      </div>
 
       <div className="why-us-section">
         <h2>Why Maharaja?</h2>
@@ -356,7 +388,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -785,15 +817,34 @@ function TripPage({ trip, onBack }) {
 }
 
 export default function App() {
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const route = useHashRoute();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  const selectedTrip = route.name === 'trip' ? trips.find(t => t.id === route.id) : null;
+
+  const goHome = () => {
+    window.location.hash = '#/';
+  };
+
+  const goToTrip = (trip) => {
+    window.location.hash = `#/trips/${trip.id}`;
+  };
+
+  let content;
+  if (route.name === 'guide') {
+    content = <GuidePage onBack={goHome} onSelectTrip={goToTrip} />;
+  } else if (selectedTrip) {
+    content = <TripPage trip={selectedTrip} onBack={goHome} />;
+  } else {
+    content = <LandingPage onSelectTrip={goToTrip} onOpenGuide={() => { window.location.hash = GUIDE_HASH; }} />;
+  }
 
   return (
     <div className="app">
-      {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
-      ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
-      )}
+      {content}
     </div>
   );
 }
