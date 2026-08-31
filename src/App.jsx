@@ -1,8 +1,10 @@
 import { useState, useMemo, useCallback } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { guides } from './data/guides';
+import GuidePage from './GuidePage.jsx';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+function LandingPage({ onSelectTrip, onOpenGuide }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -27,7 +29,10 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <div className="top-nav">
+            <button className="nav-link" onClick={() => onOpenGuide(guides[0].id)}>Guides</button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </div>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -132,6 +137,24 @@ function LandingPage({ onSelectTrip }) {
         </div>
       </div>
 
+      <div className="guides-section">
+        <h2>Travel Guides</h2>
+        <p className="guides-subtitle">Honest, decision-first guides to help you choose — no guesswork.</p>
+        <div className="guides-grid">
+          {guides.map(guide => (
+            <div key={guide.id} className="guide-card" onClick={() => onOpenGuide(guide.id)}>
+              <div className="guide-card-image" style={{ backgroundImage: `url(${guide.heroImage})` }} />
+              <div className="guide-card-info">
+                <span className="guide-card-kicker">{guide.kicker}</span>
+                <h3>{guide.title}</h3>
+                <p>{guide.description}</p>
+                <span className="guide-card-link">Read the guide →</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="phone-cta-bar">
         <div className="phone-cta-content">
           <span className="phone-cta-icon">📞</span>
@@ -189,7 +212,7 @@ function LandingPage({ onSelectTrip }) {
   );
 }
 
-function TripPage({ trip, onBack }) {
+function TripPage({ trip, onBack, onOpenGuide }) {
   const allExperiences = useMemo(() => {
     const map = {};
     trip.segments.forEach(seg => {
@@ -279,6 +302,7 @@ function TripPage({ trip, onBack }) {
   const protectionPlan = tripProtectionPlans.find(p => p.id === selectedProtection);
   const protectionCost = protectionPlan?.pricePercent ? Math.round(subtotal * protectionPlan.pricePercent / 100) : 0;
   const totalPrice = subtotal + protectionCost;
+  const relatedGuide = guides.find(g => g.destinationId === trip.id);
 
   return (
     <div className="trip-page">
@@ -313,6 +337,17 @@ function TripPage({ trip, onBack }) {
           <button className="btn-book" onClick={() => setShowBookModal(true)}>Book Now</button>
         </div>
       </div>
+
+      {relatedGuide && (
+        <div className="guide-banner" onClick={() => onOpenGuide(relatedGuide.id)}>
+          <span className="guide-banner-icon">📖</span>
+          <div className="guide-banner-text">
+            <strong>Planning a {trip.country} trip?</strong>
+            <span>Read our guide: “{relatedGuide.title}”</span>
+          </div>
+          <span className="guide-banner-link">Read the guide →</span>
+        </div>
+      )}
 
       <div className="trip-content">
         <div className="personality-bar">
@@ -356,7 +391,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -786,13 +821,41 @@ function TripPage({ trip, onBack }) {
 
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [selectedGuide, setSelectedGuide] = useState(null);
+
+  const goHome = () => {
+    setSelectedTrip(null);
+    setSelectedGuide(null);
+    window.scrollTo(0, 0);
+  };
+
+  const openTrip = (trip) => {
+    setSelectedTrip(trip);
+    setSelectedGuide(null);
+    window.scrollTo(0, 0);
+  };
+
+  const openGuide = (guideId) => {
+    const guide = guides.find(g => g.id === guideId);
+    if (!guide) return;
+    setSelectedGuide(guide);
+    setSelectedTrip(null);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="app">
       {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+        <TripPage trip={selectedTrip} onBack={goHome} onOpenGuide={openGuide} />
+      ) : selectedGuide ? (
+        <GuidePage
+          guide={selectedGuide}
+          trip={trips.find(t => t.id === selectedGuide.destinationId)}
+          onBack={goHome}
+          onSelectTrip={openTrip}
+        />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={openTrip} onOpenGuide={openGuide} />
       )}
     </div>
   );
