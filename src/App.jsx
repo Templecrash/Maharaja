@@ -1,8 +1,9 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import GuidePage from './GuidePage';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+function LandingPage({ onSelectTrip, onOpenGuide }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -27,7 +28,10 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <div className="landing-nav">
+            <button className="nav-link" onClick={onOpenGuide}>Travel Guide</button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </div>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -105,6 +109,16 @@ function LandingPage({ onSelectTrip }) {
           ))}
         </div>
       )}
+
+      <div className="guide-teaser">
+        <div className="guide-teaser-icon">📖</div>
+        <div className="guide-teaser-content">
+          <span className="guide-teaser-kicker">Travel Guide</span>
+          <h3>How to Audit a Guided-Tour Operator's All-In Price</h3>
+          <p>Compare tours on the true all-in cost per day, not the marketing price. Convert headline "from" prices, run the inclusion checklist, and ask for a live itemized total before you book.</p>
+          <button className="btn-guide" onClick={onOpenGuide}>Read the Guide</button>
+        </div>
+      </div>
 
       <div className="why-us-section">
         <h2>Why Maharaja?</h2>
@@ -185,6 +199,15 @@ function LandingPage({ onSelectTrip }) {
           </div>
         </div>
       )}
+
+      <footer className="site-footer">
+        <div className="footer-brand">MAHARAJA</div>
+        <p className="footer-tagline">Curated trips. Fixed dates. No guessing.</p>
+        <nav className="footer-links">
+          <button className="footer-link" onClick={onOpenGuide}>Travel Guide</button>
+          <a className="footer-link" href="tel:+18889030001">1-888-903-0001</a>
+        </nav>
+      </footer>
     </div>
   );
 }
@@ -356,7 +379,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -786,13 +809,22 @@ function TripPage({ trip, onBack }) {
 
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    if (showGuide || selectedTrip) window.scrollTo(0, 0);
+  }, [showGuide, selectedTrip]);
+
+  if (showGuide) {
+    return <GuidePage onBack={() => setShowGuide(false)} />;
+  }
 
   return (
     <div className="app">
       {selectedTrip ? (
         <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={setSelectedTrip} onOpenGuide={() => setShowGuide(true)} />
       )}
     </div>
   );
