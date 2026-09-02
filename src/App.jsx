@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import GuidePage from './GuidePage';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+function LandingPage({ onSelectTrip, onOpenGuide }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -27,7 +28,10 @@ function LandingPage({ onSelectTrip }) {
       <header className="landing-header">
         <div className="landing-top">
           <div className="logo">MAHARAJA</div>
-          <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          <div className="landing-actions">
+            <button className="guide-nav-btn" onClick={onOpenGuide}>How to Choose a Guided Trip</button>
+            <button className="signup-btn" onClick={() => setShowSignUp(true)}>Sign Up</button>
+          </div>
         </div>
         <p className="landing-subtitle">Curated trips. Fixed dates. No guessing.</p>
         <div className="awards-bar">
@@ -105,6 +109,15 @@ function LandingPage({ onSelectTrip }) {
           ))}
         </div>
       )}
+
+      <div className="guide-banner">
+        <div className="guide-banner-copy">
+          <span className="guide-banner-kicker">Free Trip Planning Guide</span>
+          <h2>Small group, all-inclusive, private, or cruise — which fits how you travel?</h2>
+          <p>How to choose your guided trip, including the one number most tour operators don't show you: the real all-in total.</p>
+        </div>
+        <button className="btn-book guide-banner-btn" onClick={onOpenGuide}>Read the Guide</button>
+      </div>
 
       <div className="why-us-section">
         <h2>Why Maharaja?</h2>
@@ -189,7 +202,7 @@ function LandingPage({ onSelectTrip }) {
   );
 }
 
-function TripPage({ trip, onBack }) {
+function TripPage({ trip, onBack, onOpenGuide }) {
   const allExperiences = useMemo(() => {
     const map = {};
     trip.segments.forEach(seg => {
@@ -315,6 +328,11 @@ function TripPage({ trip, onBack }) {
       </div>
 
       <div className="trip-content">
+        <div className="guide-context-bar">
+          <span>Choosing between trip styles? Our decision guide compares small group, all-inclusive, private, and cruise.</span>
+          <button className="btn-custom" onClick={onOpenGuide}>Read the Guide</button>
+        </div>
+
         <div className="personality-bar">
           <span className="personality-label">Quick select:</span>
           {Object.entries(personalityLabels).map(([key, { label, emoji }]) => (
@@ -356,7 +374,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map(segment => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -786,13 +804,26 @@ function TripPage({ trip, onBack }) {
 
 export default function App() {
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [showGuide, setShowGuide] = useState(false);
+
+  const openTrip = (trip) => {
+    setSelectedTrip(trip);
+    setShowGuide(false);
+  };
+
+  const openTripById = (id) => {
+    const trip = trips.find(t => t.id === id);
+    if (trip) openTrip(trip);
+  };
 
   return (
     <div className="app">
-      {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+      {showGuide ? (
+        <GuidePage onBack={() => setShowGuide(false)} onSelectTrip={openTripById} />
+      ) : selectedTrip ? (
+        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} onOpenGuide={() => setShowGuide(true)} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={openTrip} onOpenGuide={() => setShowGuide(true)} />
       )}
     </div>
   );
