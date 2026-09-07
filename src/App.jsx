@@ -1,8 +1,19 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { guides, guideBySlug, relatedGuideByTripId } from './data/guides';
+import GuidePage from './GuidePage';
 import './App.css';
 
-function LandingPage({ onSelectTrip }) {
+function parseRoute() {
+  const raw = window.location.hash.replace(/^#\/?/, '');
+  const [view, param] = raw.split('/');
+  if ((view === 'trip' || view === 'guide') && param) {
+    return { view, param };
+  }
+  return { view: 'landing', param: null };
+}
+
+function LandingPage({ onSelectTrip, guides }) {
   const [travelers, setTravelers] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState(null);
@@ -106,6 +117,30 @@ function LandingPage({ onSelectTrip }) {
         </div>
       )}
 
+      <div className="guides-section">
+        <div className="guides-section-header">
+          <div>
+            <h2>Travel Guides</h2>
+            <p>Straight answers to the questions travelers ask before they book.</p>
+          </div>
+        </div>
+        <div className="guides-grid">
+          {guides.map(g => (
+            <a key={g.slug} className="guide-hub-card" href={`#/guide/${g.slug}`}>
+              <div className="guide-hub-image" style={{ backgroundImage: `url(${g.image})` }}>
+                <span className="guide-hub-flag">{g.flag}</span>
+              </div>
+              <div className="guide-hub-body">
+                <span className="guide-hub-kicker">{g.category}</span>
+                <h3>{g.title}</h3>
+                <p>{g.teaser}</p>
+                <span className="guide-hub-read">Read the guide &rarr;</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
       <div className="why-us-section">
         <h2>Why Maharaja?</h2>
         <div className="why-us-grid">
@@ -189,7 +224,7 @@ function LandingPage({ onSelectTrip }) {
   );
 }
 
-function TripPage({ trip, onBack }) {
+function TripPage({ trip, onBack, relatedGuide }) {
   const allExperiences = useMemo(() => {
     const map = {};
     trip.segments.forEach(seg => {
@@ -356,7 +391,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -547,6 +582,17 @@ function TripPage({ trip, onBack }) {
                   <span className="review-highlight">📍 {review.tripHighlight}</span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {relatedGuide && (
+          <div className="related-guide">
+            <div className="related-guide-body">
+              <span className="related-guide-kicker">{relatedGuide.flag} {relatedGuide.category}</span>
+              <h2>{relatedGuide.title}</h2>
+              <p>{relatedGuide.teaser}</p>
+              <a className="btn-guide" href={`#/guide/${relatedGuide.slug}`}>Read the Guide</a>
             </div>
           </div>
         )}
@@ -785,14 +831,45 @@ function TripPage({ trip, onBack }) {
 }
 
 export default function App() {
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [route, setRoute] = useState(parseRoute);
+
+  const goTo = useCallback((path) => {
+    window.location.hash = path;
+  }, []);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setRoute(parseRoute());
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const trip = route.view === 'trip' ? trips.find(t => t.id === route.param) : null;
+  const guide = route.view === 'guide' ? guideBySlug(route.param) : null;
+
+  useEffect(() => {
+    if (guide) {
+      document.title = `${guide.title} | Maharaja`;
+    } else if (trip) {
+      document.title = `${trip.country}: ${trip.title} | Maharaja`;
+    } else {
+      document.title = 'Maharaja — Curated Travel';
+    }
+  }, [guide, trip]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [guide, trip]);
 
   return (
     <div className="app">
-      {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+      {guide ? (
+        <GuidePage guide={guide} />
+      ) : trip ? (
+        <TripPage trip={trip} relatedGuide={relatedGuideByTripId(trip.id)} onBack={() => goTo('/')} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage guides={guides} onSelectTrip={(t) => goTo(`/trip/${t.id}`)} />
       )}
     </div>
   );
