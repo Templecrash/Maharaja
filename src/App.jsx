@@ -1,5 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { trips, personalityLabels, travelStyles, tripStyles, dayByDay, tripReviews, destinationExperts, tripInclusions, awards, tripProtectionPlans } from './data/trips';
+import { getOrCreateReferralCode, captureIncomingReferral, getIncomingReferral, readTripFromUrl, buildInviteUrl, trackReferralEvent } from './referral';
 import './App.css';
 
 function LandingPage({ onSelectTrip }) {
@@ -9,9 +10,44 @@ function LandingPage({ onSelectTrip }) {
   const [showSignUp, setShowSignUp] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const [copiedTripId, setCopiedTripId] = useState(null);
 
   const months = useMemo(() => [...new Set(trips.map(t => t.departureDate.split(' ')[0]))], []);
   const continents = useMemo(() => [...new Set(trips.map(t => t.continent))], []);
+
+  const shareTrip = useCallback(async (event, trip) => {
+    event.stopPropagation();
+    const code = getOrCreateReferralCode();
+    const link = buildInviteUrl({
+      origin: window.location.origin,
+      pathname: window.location.pathname,
+      tripId: trip.id,
+      code,
+    });
+    trackReferralEvent('referral_card_share_clicked', { trip: trip.id, referral_code: code });
+    const shareData = {
+      title: `Maharaja: ${trip.country} — ${trip.title}`,
+      text: "Join me on this trip — we'll both get 5% off when you book.",
+      url: link,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        trackReferralEvent('referral_invite_shared', { trip: trip.id, referral_code: code });
+        return;
+      }
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(link);
+        setCopiedTripId(trip.id);
+        trackReferralEvent('referral_invite_link_copied', { trip: trip.id, referral_code: code });
+        setTimeout(() => setCopiedTripId(null), 2500);
+        return;
+      }
+    } catch {
+      return;
+    }
+    onSelectTrip(trip);
+  }, [onSelectTrip]);
 
   const filtered = useMemo(() => {
     return trips.filter(trip => {
@@ -100,6 +136,9 @@ function LandingPage({ onSelectTrip }) {
                   <span className="trip-card-duration">{trip.duration} days</span>
                   <span className="trip-card-date">{trip.departureDate}</span>
                 </div>
+                <button type="button" className="trip-card-share" onClick={(event) => shareTrip(event, trip)}>
+                  <span>{copiedTripId === trip.id ? 'Invite link copied' : 'Invite a friend · 5% off both'}</span>
+                </button>
               </div>
             </div>
           ))}
@@ -189,7 +228,7 @@ function LandingPage({ onSelectTrip }) {
   );
 }
 
-function TripPage({ trip, onBack }) {
+function TripPage({ trip, onBack, incomingReferral }) {
   const allExperiences = useMemo(() => {
     const map = {};
     trip.segments.forEach(seg => {
@@ -215,8 +254,9 @@ function TripPage({ trip, onBack }) {
   const [showBookModal, setShowBookModal] = useState(false);
   const [passengers, setPassengers] = useState([{ name: '', dob: '', passport: '', nationality: '' }]);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [shareForm, setShareForm] = useState({ friendName: '', friendEmail: '', yourName: '', message: '' });
-  const [shareSent, setShareSent] = useState(false);
+  const [shareCode, setShareCode] = useState('');
+  const [shareLink, setShareLink] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
   const [selectedProtection, setSelectedProtection] = useState('none');
   const [showItinerary, setShowItinerary] = useState(false);
 
@@ -231,6 +271,53 @@ function TripPage({ trip, onBack }) {
   const updatePassenger = useCallback((index, field, value) => {
     setPassengers(prev => prev.map((p, i) => i === index ? { ...p, [field]: value } : p));
   }, []);
+
+  const openShareModal = useCallback(() => {
+    const code = getOrCreateReferralCode();
+    setShareCode(code);
+    setShareLink(buildInviteUrl({
+      origin: window.location.origin,
+      pathname: window.location.pathname,
+      tripId: trip.id,
+      code,
+    }));
+    setLinkCopied(false);
+    setShowShareModal(true);
+    trackReferralEvent('referral_modal_opened', { trip: trip.id, referral_code: code });
+  }, [trip.id]);
+
+  const copyShareLink = useCallback(async () => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareLink);
+      } else {
+        const input = document.getElementById('referral-link-input');
+        input?.select();
+        document.execCommand('copy');
+      }
+      setLinkCopied(true);
+      trackReferralEvent('referral_invite_link_copied', { trip: trip.id, referral_code: shareCode });
+    } catch {
+      // Clipboard access can be blocked; the link stays visible for manual copy.
+    }
+  }, [shareLink, shareCode, trip.id]);
+
+  const shareInvite = useCallback(async () => {
+    if (!navigator.share) {
+      copyShareLink();
+      return;
+    }
+    try {
+      await navigator.share({
+        title: `Maharaja: ${trip.country} — ${trip.title}`,
+        text: "Join me on this trip — we'll both get 5% off when you book.",
+        url: shareLink,
+      });
+      trackReferralEvent('referral_invite_shared', { trip: trip.id, referral_code: shareCode });
+    } catch {
+      // The share sheet was dismissed or is unavailable.
+    }
+  }, [trip.country, trip.title, trip.id, shareLink, shareCode, copyShareLink]);
 
   const toggleExperience = useCallback((id, included) => {
     if (included) return;
@@ -309,6 +396,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
         <div className="trip-sticky-right">
+          <button className="btn-referral" onClick={openShareModal}>Invite a friend · 5% off both</button>
           <button className="btn-custom" onClick={() => setShowCustomModal(true)}>Customize with Expert</button>
           <button className="btn-book" onClick={() => setShowBookModal(true)}>Book Now</button>
         </div>
@@ -356,7 +444,7 @@ function TripPage({ trip, onBack }) {
           </div>
         </div>
 
-        {trip.segments.map((segment, segIdx) => {
+        {trip.segments.map((segment) => {
           const hotel = trip.hotels.find(h => h.segment === segment.name);
           const hotelIndex = hotel ? trip.hotels.indexOf(hotel) : -1;
           const isUpgraded = hotel ? hotelUpgrades[hotelIndex] : false;
@@ -554,8 +642,8 @@ function TripPage({ trip, onBack }) {
         <div className="share-cta-section">
           <div className="share-cta-icon">✉️</div>
           <h3>Share this trip with a friend</h3>
-          <p>Invite someone to join you and you'll <strong>both get 5% off</strong> your trip.</p>
-          <button className="btn-share-large" onClick={() => { setShareSent(false); setShareForm({ friendName: '', friendEmail: '', yourName: '', message: '' }); setShowShareModal(true); }}>Send Invite</button>
+          <p>Invite someone to join you and you'll <strong>both get 5% off</strong> when they book and travel. Credit unlocks after their booking and can't be combined with other offers.</p>
+          <button className="btn-share-large" onClick={openShareModal}>Get invite link</button>
         </div>
 
         <div className="custom-cta-section">
@@ -668,43 +756,38 @@ function TripPage({ trip, onBack }) {
         <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
           <div className="modal share-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setShowShareModal(false)}>&times;</button>
-            {shareSent ? (
-              <div className="share-success">
-                <div className="share-success-icon">✅</div>
-                <h2>Invite Sent!</h2>
-                <p>We've emailed the trip details for <strong>{trip.country}: {trip.title}</strong> to <strong>{shareForm.friendEmail}</strong>.</p>
-                <p className="share-discount-note">When your friend books, you'll both receive a <strong>5% discount</strong> automatically.</p>
-                <button className="btn-book" onClick={() => setShowShareModal(false)}>Done</button>
+            <h2>Invite a friend to {trip.country}</h2>
+            <p className="share-subtitle">Share your invite link, and when your friend books and travels you <strong>both save 5%</strong>.</p>
+            <div className="share-preview">
+              <div className="share-preview-card">
+                <div className="share-preview-image" style={{ backgroundImage: `url(${trip.heroImage})` }} />
+                <div className="share-preview-info">
+                  <strong>{trip.flag} {trip.country}: {trip.title}</strong>
+                  <span>{trip.departureDateFull} · {trip.duration} days</span>
+                  <span className="share-preview-price">From ${trip.basePrice.toLocaleString()}/person <span className="share-discount-badge">5% off with referral</span></span>
+                </div>
               </div>
-            ) : (
-              <>
-                <h2>Share {trip.country} Trip</h2>
-                <p className="share-subtitle">Send your friend the full trip details. When they book, you <strong>both save 5%</strong> on your trip.</p>
-                <form onSubmit={e => { e.preventDefault(); setShareSent(true); }}>
-                  <div className="booking-section">
-                    <h3>Your Friend</h3>
-                    <input type="text" placeholder="Friend's name" required value={shareForm.friendName} onChange={e => setShareForm(f => ({ ...f, friendName: e.target.value }))} />
-                    <input type="email" placeholder="Friend's email address" required value={shareForm.friendEmail} onChange={e => setShareForm(f => ({ ...f, friendEmail: e.target.value }))} />
-                  </div>
-                  <div className="booking-section">
-                    <h3>From You</h3>
-                    <input type="text" placeholder="Your name" required value={shareForm.yourName} onChange={e => setShareForm(f => ({ ...f, yourName: e.target.value }))} />
-                    <textarea placeholder="Add a personal message (optional)" rows={3} value={shareForm.message} onChange={e => setShareForm(f => ({ ...f, message: e.target.value }))} />
-                  </div>
-                  <div className="share-preview">
-                    <div className="share-preview-card">
-                      <div className="share-preview-image" style={{ backgroundImage: `url(${trip.heroImage})` }} />
-                      <div className="share-preview-info">
-                        <strong>{trip.flag} {trip.country}: {trip.title}</strong>
-                        <span>{trip.departureDateFull} · {trip.duration} days</span>
-                        <span className="share-preview-price">From ${trip.basePrice.toLocaleString()}/person <span className="share-discount-badge">5% off with referral</span></span>
-                      </div>
-                    </div>
-                  </div>
-                  <button type="submit" className="btn-book">Send Invite ✉️</button>
-                </form>
-              </>
-            )}
+            </div>
+            <label className="share-link-label" htmlFor="referral-link-input">Your invite link</label>
+            <div className="share-link-row">
+              <input
+                id="referral-link-input"
+                className="share-link-input"
+                type="text"
+                readOnly
+                value={shareLink}
+                onFocus={e => e.target.select()}
+              />
+              <button type="button" className="btn-copy-link" onClick={copyShareLink}>{linkCopied ? 'Copied' : 'Copy link'}</button>
+            </div>
+            {linkCopied && <p className="share-copied-note">Link copied — paste it into a message to your friend.</p>}
+            <p className="share-terms">Credit unlocks after your friend books and travels, and can't be combined with other offers. Please let your friend know you'll receive a credit too.</p>
+            <div className="share-actions">
+              {navigator.share && (
+                <button type="button" className="btn-book" onClick={shareInvite}>Share invite</button>
+              )}
+              <button type="button" className="btn-close-share" onClick={() => setShowShareModal(false)}>Done</button>
+            </div>
           </div>
         </div>
       )}
@@ -714,7 +797,14 @@ function TripPage({ trip, onBack }) {
           <div className="modal booking-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setShowBookModal(false)}>&times;</button>
             <h2>Book {trip.country}: {trip.title}</h2>
-            <form onSubmit={e => { e.preventDefault(); setShowBookModal(false); }}>
+            <form onSubmit={e => {
+              e.preventDefault();
+              trackReferralEvent('booking_form_submitted', { trip: trip.id, referral_code: incomingReferral || null });
+              if (incomingReferral) {
+                trackReferralEvent('referral_booking_submitted', { trip: trip.id, referral_code: incomingReferral });
+              }
+              setShowBookModal(false);
+            }}>
 
               <div className="booking-section">
                 <h3>Lead Passenger</h3>
@@ -785,14 +875,48 @@ function TripPage({ trip, onBack }) {
 }
 
 export default function App() {
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [incomingReferral] = useState(() => captureIncomingReferral() || getIncomingReferral());
+  const [selectedTrip, setSelectedTrip] = useState(() => {
+    const tripId = readTripFromUrl();
+    return tripId ? trips.find(t => t.id === tripId) || null : null;
+  });
+  const referralOpenedRef = useRef(false);
+
+  useEffect(() => {
+    if (incomingReferral && !referralOpenedRef.current) {
+      referralOpenedRef.current = true;
+      trackReferralEvent('referral_link_opened', { referral_code: incomingReferral, trip: selectedTrip?.id || null });
+    }
+  }, [incomingReferral, selectedTrip]);
+
+  const selectTrip = useCallback((trip) => {
+    setSelectedTrip(trip);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('trip', trip.id);
+      window.history.replaceState({}, '', url);
+    } catch {
+      // History updates are a deep-link nicety; ignore failures.
+    }
+  }, []);
+
+  const backToTrips = useCallback(() => {
+    setSelectedTrip(null);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('trip');
+      window.history.replaceState({}, '', url);
+    } catch {
+      // History updates are a deep-link nicety; ignore failures.
+    }
+  }, []);
 
   return (
     <div className="app">
       {selectedTrip ? (
-        <TripPage trip={selectedTrip} onBack={() => setSelectedTrip(null)} />
+        <TripPage trip={selectedTrip} onBack={backToTrips} incomingReferral={incomingReferral} />
       ) : (
-        <LandingPage onSelectTrip={setSelectedTrip} />
+        <LandingPage onSelectTrip={selectTrip} />
       )}
     </div>
   );
